@@ -64,6 +64,7 @@ bool BinaryRelation::isTransitive() const
 			if (it1->first== it2->first&&it1->second == it2->second) continue;
 
 			if (it2->first != it1->second) continue;
+			
 
 			if (this->relation_->find(make_pair(it1->first, it2->second)) == this->relation_->end())
 				return false;
@@ -100,18 +101,16 @@ BinaryRelation BinaryRelation::operator+(const BinaryRelation & other) const
 BinaryRelation BinaryRelation::operator*() const
 {
 
-	BinaryRelation result;
-	BinaryRelation local(*this);
-	BinaryRelation localN (*this);
-	BinaryRelation localNminus1;
+	BinaryRelation result(*this);
+	BinaryRelation previous;
 
 	do
 	{
-		localNminus1 = localN;
-		result = result+ localN;
-		localN = localN*local;
-		
-	} while (localN!=localNminus1);
+		previous = result;
+		result = result * (*this);
+		result = result + previous;
+
+	} while (previous != result);
 
 	return result;
 }
@@ -124,10 +123,12 @@ BinaryRelation BinaryRelation::operator*(const BinaryRelation & other) const
 
 	for (CIterator it1 = this->relation_->begin(); it1 != this->relation_->end(); it1++)
 	{
-		for (CIterator it2 = this->relation_->begin(); it2 != this->relation_->end(); it2++)
+		for (CIterator it2 = other.relation_->begin(); it2 != other.relation_->end(); it2++)
 		{
-			if (it1->second == it2->first)
+			if (it1->second == it2->first) {
 				result.relation_->insert(make_pair(it1->first, it2->second));
+				
+			}
 		}
 	}
 
